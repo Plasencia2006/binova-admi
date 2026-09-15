@@ -1,0 +1,6 @@
+export { default as api } from './api'
+export { authService } from './authService'
+export { tachoService } from './tachoService'
+export { carritoService } from './carritoService'
+export { asignacionService } from './asignacionService'
+export { dashboardService } from './dashboardService'
