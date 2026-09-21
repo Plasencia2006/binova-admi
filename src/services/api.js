@@ -1,22 +1,22 @@
 import axios from 'axios'
 
 const api = axios.create({
-    baseURL: import.meta.env.VITE_API_URL || 'http://localhost:3000/api',
+    baseURL: import.meta.env.VITE_API_URL || 'http://localhost:3000/api/v1',
     headers: {
         'Content-Type': 'application/json',
     },
     timeout: 15000,
 })
 
-// Interceptor: agregar token JWT si existe
+// Adjuntar JWT en cada request
 api.interceptors.request.use(
     (config) => {
-        const user = localStorage.getItem('binova_user')
-        if (user) {
+        const raw = localStorage.getItem('binova_auth')
+        if (raw) {
             try {
-                const parsed = JSON.parse(user)
-                if (parsed.token) {
-                    config.headers.Authorization = `Bearer ${parsed.token}`
+                const { token } = JSON.parse(raw)
+                if (token) {
+                    config.headers.Authorization = `Bearer ${token}`
                 }
             } catch {
                 // ignore
@@ -27,14 +27,13 @@ api.interceptors.request.use(
     (error) => Promise.reject(error)
 )
 
-// Interceptor: manejar errores de respuesta
+// 401 → cerrar sesión y mandar a login
 api.interceptors.response.use(
     (response) => response,
     (error) => {
         if (error.response?.status === 401) {
-            // Sesión expirada o no autorizada
-            localStorage.removeItem('binova_user')
-            if (window.location.pathname !== '/login') {
+            localStorage.removeItem('binova_auth')
+            if (!window.location.pathname.startsWith('/login')) {
                 window.location.href = '/login'
             }
         }

@@ -4,8 +4,8 @@ import { useAuth } from '../../context/AuthContext'
 import { Mail, Lock, Eye, EyeOff } from 'lucide-react'
 
 export default function LoginPage() {
-    const [email, setEmail] = useState('')
-    const [password, setPassword] = useState('')
+    const [correo, setCorreo] = useState('')
+    const [clave, setClave] = useState('')
     const [showPassword, setShowPassword] = useState(false)
     const [error, setError] = useState('')
     const [loading, setLoading] = useState(false)
@@ -18,20 +18,24 @@ export default function LoginPage() {
         setError('')
         setLoading(true)
 
-        setTimeout(() => {
-            if (email && password) {
-                login({
-                    id: 1,
-                    name: 'Administrador',
-                    email,
-                    role: 'admin',
-                })
-                navigate('/dashboard')
+        try {
+            const usuario = await login(correo.trim(), clave)
+
+            // Redirección según rol
+            if (usuario.rol === 'superadmin') {
+                navigate('/superadmin', { replace: true })
             } else {
-                setError('Correo y contraseña son obligatorios')
+                navigate('/dashboard', { replace: true })
             }
+        } catch (err) {
+            const msg =
+                err.response?.data?.message ||
+                err.response?.data?.error ||
+                'Correo o contraseña incorrectos'
+            setError(typeof msg === 'string' ? msg : 'No se pudo iniciar sesión')
+        } finally {
             setLoading(false)
-        }, 800)
+        }
     }
 
     return (
@@ -52,12 +56,17 @@ export default function LoginPage() {
                         Correo electrónico
                     </label>
                     <div className="relative">
-                        <Mail size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-binova-gray" />
+                        <Mail
+                            size={18}
+                            className="absolute left-3 top-1/2 -translate-y-1/2 text-binova-gray"
+                        />
                         <input
                             type="email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            placeholder="admin@binova.pe"
+                            value={correo}
+                            onChange={(e) => setCorreo(e.target.value)}
+                            placeholder="correo@ejemplo.com"
+                            required
+                            autoComplete="email"
                             className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-binova-green focus:border-transparent bg-white transition-all duration-300"
                         />
                     </div>
@@ -68,12 +77,17 @@ export default function LoginPage() {
                         Contraseña
                     </label>
                     <div className="relative">
-                        <Lock size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-binova-gray" />
+                        <Lock
+                            size={18}
+                            className="absolute left-3 top-1/2 -translate-y-1/2 text-binova-gray"
+                        />
                         <input
                             type={showPassword ? 'text' : 'password'}
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
+                            value={clave}
+                            onChange={(e) => setClave(e.target.value)}
                             placeholder="••••••••"
+                            required
+                            autoComplete="current-password"
                             className="w-full pl-10 pr-10 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-binova-green focus:border-transparent bg-white transition-all duration-300"
                         />
                         <button

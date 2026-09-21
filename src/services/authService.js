@@ -1,28 +1,46 @@
 import api from './api'
 
 export const authService = {
-    login: async (email, password) => {
-        const { data } = await api.post('/auth/login', { email, password })
+    /**
+     * POST /auth/login
+     * body: { correo, clave }
+     * response: { token, usuario }  (usuario incluye organizacion si aplica)
+     */
+    login: async (correo, clave) => {
+        const { data } = await api.post('/auth/login', { correo, clave })
         return data
     },
 
-    register: async (payload) => {
-        // payload: { name, email, password }
-        const { data } = await api.post('/auth/register', payload)
+    /**
+     * POST /auth/registro-particular
+     * body: { nombre, correo, clave }
+     */
+    registroParticular: async ({ nombre, correo, clave }) => {
+        const { data } = await api.post('/auth/registro-particular', {
+            nombre,
+            correo,
+            clave,
+        })
         return data
     },
 
+    /**
+     * GET /auth/me
+     */
     me: async () => {
         const { data } = await api.get('/auth/me')
         return data
     },
 
-    logout: async () => {
-        try {
-            await api.post('/auth/logout')
-        } catch {
-            // aunque falle, limpiamos local
-        }
-        localStorage.removeItem('binova_user')
+    /**
+     * POST /auth/cambiar-clave
+     * body: { clave_actual, clave_nueva }
+     */
+    cambiarClave: async (clave_actual, clave_nueva) => {
+        const { data } = await api.post('/auth/cambiar-clave', {
+            clave_actual,
+            clave_nueva,
+        })
+        return data
     },
 }

@@ -1,13 +1,15 @@
 import api from './api'
 
 export const dashboardService = {
-    getStats: async () => {
-        const { data } = await api.get('/dashboard/stats')
+    getResumen: async () => {
+        const { data } = await api.get('/estadisticas/resumen')
         return data
     },
 
-    getActividad: async () => {
-        const { data } = await api.get('/dashboard/actividad')
-        return data
+    getRecoleccionesPorDia: async (dias = 14) => {
+        const { data } = await api.get('/estadisticas/recolecciones-por-dia', {
+            params: { dias },
+        })
+        return Array.isArray(data) ? data : data.data || data.serie || []
     },
 }

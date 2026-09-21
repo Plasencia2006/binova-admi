@@ -1,38 +1,48 @@
+import { useState } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
 import {
     LayoutDashboard,
     Trash2,
     Truck,
-    Link2,
     Map,
     Users,
     Settings,
+    AlertTriangle,
+    Clock,
+    PackageCheck,
+    Wrench,
     LogOut,
     Menu,
     X,
     ChevronLeft,
     ChevronRight,
 } from 'lucide-react'
-import { useState } from 'react'
 import { useAuth } from '../../context/AuthContext'
 import { useSidebar } from '../../context/SidebarContext'
 import logo from '../../assets/logo-binova-icono.png'
 
-const menuItems = [
-    { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
-    { name: 'Tachos', path: '/tachos', icon: Trash2 },
-    { name: 'Carritos', path: '/carritos', icon: Truck },
-    { name: 'Asignaciones', path: '/asignaciones', icon: Link2 },
-    { name: 'Mapa', path: '/mapa', icon: Map },
-    { name: 'Usuarios', path: '/usuarios', icon: Users },
-    { name: 'Configuración', path: '/configuracion', icon: Settings },
+const ALL_MENU = [
+    { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard, roles: ['admin', 'supervisor'] },
+    { name: 'Contenedores', path: '/tachos', icon: Trash2, roles: ['admin', 'supervisor', 'operario', 'empleado', 'particular'] },
+    { name: 'Carritos', path: '/carritos', icon: Truck, roles: ['admin', 'supervisor', 'operario'] },
+    { name: 'Alertas', path: '/alertas', icon: AlertTriangle, roles: ['admin', 'supervisor', 'operario'] },
+    { name: 'Turno', path: '/turno', icon: Clock, roles: ['operario', 'admin', 'supervisor'] },
+    { name: 'Recolecciones', path: '/recolecciones', icon: PackageCheck, roles: ['admin', 'supervisor', 'operario'] },
+    { name: 'Incidencias', path: '/incidencias', icon: Wrench, roles: ['admin', 'supervisor', 'operario', 'empleado'] },
+    { name: 'Mapa', path: '/mapa', icon: Map, roles: ['admin', 'supervisor', 'operario', 'empleado', 'particular'] },
+    { name: 'Usuarios', path: '/usuarios', icon: Users, roles: ['admin', 'supervisor'] },
+    { name: 'Configuración', path: '/configuracion', icon: Settings, roles: ['admin', 'supervisor', 'operario', 'empleado', 'particular'] },
 ]
 
 export default function Sidebar() {
     const [isOpen, setIsOpen] = useState(false)
     const { collapsed, toggle } = useSidebar()
-    const { logout } = useAuth()
+    const { logout, rol } = useAuth()
     const navigate = useNavigate()
+
+    const menuItems = ALL_MENU.filter(
+        (item) => !item.roles || item.roles.includes(rol)
+    )
 
     const handleLogout = () => {
         logout()
@@ -41,7 +51,6 @@ export default function Sidebar() {
 
     return (
         <>
-            {/* Botón menú móvil */}
             <button
                 onClick={() => setIsOpen(!isOpen)}
                 className="lg:hidden fixed top-4 left-4 z-50 p-2.5 rounded-xl bg-[#0f172a] text-white shadow-lg"
@@ -49,7 +58,6 @@ export default function Sidebar() {
                 {isOpen ? <X size={22} /> : <Menu size={22} />}
             </button>
 
-            {/* Overlay móvil */}
             {isOpen && (
                 <div
                     className="lg:hidden fixed inset-0 bg-black/60 z-40 backdrop-blur-sm"
@@ -57,7 +65,6 @@ export default function Sidebar() {
                 />
             )}
 
-            {/* Sidebar */}
             <aside
                 className={`
           fixed top-0 left-0 z-40 h-full bg-[#0B1220] text-white
@@ -69,7 +76,6 @@ export default function Sidebar() {
           w-64
         `}
             >
-                {/* LOGO */}
                 <div
                     className={`
             flex items-center gap-3 border-b border-white/10
@@ -99,7 +105,6 @@ export default function Sidebar() {
                     )}
                 </div>
 
-                {/* Botón contraer (solo desktop) */}
                 <button
                     onClick={toggle}
                     className="hidden lg:flex absolute -right-3 top-20 w-6 h-6 rounded-full bg-[#6EA838] text-white items-center justify-center shadow-md hover:scale-110 transition-transform z-50"
@@ -108,7 +113,6 @@ export default function Sidebar() {
                     {collapsed ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
                 </button>
 
-                {/* MENÚ */}
                 <nav className="flex-1 mt-4 px-3 space-y-1 overflow-y-auto">
                     {menuItems.map((item) => {
                         const Icon = item.icon
@@ -140,7 +144,6 @@ export default function Sidebar() {
                     })}
                 </nav>
 
-                {/* LOGOUT */}
                 <div className="p-3 border-t border-white/10">
                     <button
                         onClick={handleLogout}
