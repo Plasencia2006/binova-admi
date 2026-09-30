@@ -3,33 +3,45 @@ import { Cpu, Plus, Layers, Copy, CheckCircle } from 'lucide-react'
 import { contenedorService } from '../../services/contenedorService'
 
 export default function InventarioPage() {
+    const [codigo, setCodigo] = useState('')
     const [deviceId, setDeviceId] = useState('')
-    const [loteText, setLoteText] = useState('')
+    const [alturaCm, setAlturaCm] = useState('')
     const [loading, setLoading] = useState(false)
-    const [loteLoading, setLoteLoading] = useState(false)
     const [result, setResult] = useState(null)
-    const [loteResult, setLoteResult] = useState(null)
     const [error, setError] = useState('')
+
+    const [loteAlturaCm, setLoteAlturaCm] = useState('')
+    const [loteText, setLoteText] = useState('')
+    const [loteLoading, setLoteLoading] = useState(false)
+    const [loteResult, setLoteResult] = useState(null)
 
     const provisionarUno = async (e) => {
         e.preventDefault()
         setError('')
         setResult(null)
-        if (!deviceId.trim()) {
-            setError('Ingresa un device_id')
+        if (!codigo.trim() || !deviceId.trim()) {
+            setError('Ingresa el código y el device_id')
+            return
+        }
+        if (!alturaCm || Number(alturaCm) <= 0) {
+            setError('Ingresa una altura de sensor válida (cm)')
             return
         }
         setLoading(true)
         try {
             const data = await contenedorService.inventario({
+                codigo: codigo.trim(),
                 device_id: deviceId.trim(),
+                altura_cm: Number(alturaCm),
             })
             setResult(data)
+            setCodigo('')
             setDeviceId('')
+            setAlturaCm('')
         } catch (err) {
             setError(
-                err.response?.data?.message ||
                 err.response?.data?.error ||
+                err.response?.data?.message ||
                 'Error al provisionar dispositivo'
             )
         } finally {
@@ -41,13 +53,19 @@ export default function InventarioPage() {
         e.preventDefault()
         setError('')
         setLoteResult(null)
+
+        if (!loteAlturaCm || Number(loteAlturaCm) <= 0) {
+            setError('Ingresa una altura de sensor válida (cm) para el lote')
+            return
+        }
+
         const lines = loteText
             .split('\n')
             .map((l) => l.trim())
             .filter(Boolean)
 
         if (lines.length === 0) {
-            setError('Ingresa al menos un device_id por línea')
+            setError('Ingresa al menos un dispositivo (una línea por dispositivo)')
             return
         }
         if (lines.length > 1000) {
@@ -55,18 +73,29 @@ export default function InventarioPage() {
             return
         }
 
+        const dispositivos = []
+        for (const [i, line] of lines.entries()) {
+            const [codigoLinea, deviceIdLinea] = line.split(',').map((p) => p.trim())
+            if (!codigoLinea || !deviceIdLinea) {
+                setError(`Línea ${i + 1} inválida: usa "codigo,device_id"`)
+                return
+            }
+            dispositivos.push({ codigo: codigoLinea, device_id: deviceIdLinea })
+        }
+
         setLoteLoading(true)
         try {
-            // Ajusta el body si tu API espera otro formato
             const data = await contenedorService.inventarioLote({
-                dispositivos: lines.map((device_id) => ({ device_id })),
+                altura_cm: Number(loteAlturaCm),
+                dispositivos,
             })
             setLoteResult(data)
             setLoteText('')
+            setLoteAlturaCm('')
         } catch (err) {
             setError(
-                err.response?.data?.message ||
                 err.response?.data?.error ||
+                err.response?.data?.message ||
                 'Error en inventario por lote'
             )
         } finally {
@@ -83,7 +112,7 @@ export default function InventarioPage() {
             <div>
                 <h1 className="text-2xl font-bold text-gray-900">Inventario IoT</h1>
                 <p className="text-sm text-gray-500 mt-1">
-                    Provisionar dispositivos ESP32 sin organización (código de vinculación)
+                    Provisionar dispositivos ESP32 sin organización (código de vinculación por QR)
                 </p>
             </div>
 
@@ -99,17 +128,30 @@ export default function InventarioPage() {
                     <Cpu size={18} className="text-[#6EA838]" />
                     Provisionar un dispositivo
                 </h2>
-                <form onSubmit={provisionarUno} className="flex flex-col sm:flex-row gap-3">
+                <form onSubmit={provisionarUno} className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <input
+                        value={codigo}
+                        onChange={(e) => setCodigo(e.target.value)}
+                        placeholder="Código (ej. BIN-045)"
+                        className="px-3 py-2.5 border border-gray-200 rounded-xl text-sm font-mono focus:outline-none focus:ring-2 focus:ring-[#6EA838]"
+                    />
                     <input
                         value={deviceId}
                         onChange={(e) => setDeviceId(e.target.value)}
-                        placeholder="device_id del ESP32 (ej. ESP32-A1B2C3)"
-                        className="flex-1 px-3 py-2.5 border border-gray-200 rounded-xl text-sm font-mono focus:outline-none focus:ring-2 focus:ring-[#6EA838]"
+                        placeholder="device_id del ESP32"
+                        className="px-3 py-2.5 border border-gray-200 rounded-xl text-sm font-mono focus:outline-none focus:ring-2 focus:ring-[#6EA838]"
+                    />
+                    <input
+                        value={alturaCm}
+                        onChange={(e) => setAlturaCm(e.target.value)}
+                        type="number"
+                        placeholder="Altura sensor (cm)"
+                        className="px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#6EA838]"
                     />
                     <button
                         type="submit"
                         disabled={loading}
-                        className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-[#6EA838] hover:bg-[#5a8f2e] text-white text-sm font-medium rounded-xl disabled:opacity-60"
+                        className="sm:col-span-3 inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-[#6EA838] hover:bg-[#5a8f2e] text-white text-sm font-medium rounded-xl disabled:opacity-60"
                     >
                         <Plus size={16} />
                         {loading ? 'Guardando...' : 'Provisionar'}
@@ -125,12 +167,10 @@ export default function InventarioPage() {
                         <pre className="text-xs bg-white/80 p-3 rounded-lg overflow-x-auto text-gray-700">
                             {JSON.stringify(result, null, 2)}
                         </pre>
-                        {(result.codigo_vinculacion || result.codigo) && (
+                        {result.codigo_vinculacion && (
                             <button
                                 type="button"
-                                onClick={() =>
-                                    copyText(result.codigo_vinculacion || result.codigo)
-                                }
+                                onClick={() => copyText(result.codigo_vinculacion)}
                                 className="inline-flex items-center gap-1.5 text-xs text-emerald-700 hover:underline"
                             >
                                 <Copy size={12} />
@@ -148,14 +188,22 @@ export default function InventarioPage() {
                     Provisionar por lote
                 </h2>
                 <p className="text-xs text-gray-400 mb-3">
-                    Un <code className="bg-gray-50 px-1 rounded">device_id</code> por línea (máx. 1000)
+                    Todos comparten la misma altura de sensor. Una línea por dispositivo, formato{' '}
+                    <code className="bg-gray-50 px-1 rounded">codigo,device_id</code> (máx. 1000)
                 </p>
                 <form onSubmit={provisionarLote} className="space-y-3">
+                    <input
+                        value={loteAlturaCm}
+                        onChange={(e) => setLoteAlturaCm(e.target.value)}
+                        type="number"
+                        placeholder="Altura de sensor para todo el lote (cm)"
+                        className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#6EA838]"
+                    />
                     <textarea
                         value={loteText}
                         onChange={(e) => setLoteText(e.target.value)}
                         rows={6}
-                        placeholder={'ESP32-001\nESP32-002\nESP32-003'}
+                        placeholder={'BIN-001,ESP32-001\nBIN-002,ESP32-002\nBIN-003,ESP32-003'}
                         className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm font-mono focus:outline-none focus:ring-2 focus:ring-[#6EA838] resize-y"
                     />
                     <button
@@ -170,19 +218,15 @@ export default function InventarioPage() {
 
                 {loteResult && (
                     <div className="mt-4 p-4 bg-blue-50 border border-blue-100 rounded-xl text-sm">
-                        <p className="font-medium text-blue-800 mb-2">Resultado del lote</p>
+                        <p className="font-medium text-blue-800 mb-2">
+                            {loteResult.total} dispositivo(s) creados
+                        </p>
                         <pre className="text-xs bg-white/80 p-3 rounded-lg overflow-x-auto text-gray-700 max-h-48">
                             {JSON.stringify(loteResult, null, 2)}
                         </pre>
                     </div>
                 )}
             </section>
-
-            <p className="text-xs text-gray-400">
-                Si el body del lote no coincide con tu API, ajusta{' '}
-                <code className="bg-gray-50 px-1 rounded">inventarioLote</code> en{' '}
-                <code className="bg-gray-50 px-1 rounded">contenedorService.js</code>.
-            </p>
         </div>
     )
 }

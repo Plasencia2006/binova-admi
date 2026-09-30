@@ -9,6 +9,7 @@ import LandingPage from './pages/public/LandingPage'
 import SolicitudEmpresaPage from './pages/public/SolicitudEmpresaPage'
 import LoginPage from './pages/auth/LoginPage'
 import RegisterPage from './pages/auth/RegisterPage'
+import ActivarPage from './pages/auth/ActivarPage'
 import DashboardPage from './pages/dashboard/DashboardPage'
 import TachosPage from './pages/tachos/TachosPage'
 import CarritosPage from './pages/carritos/CarritosPage'
@@ -40,6 +41,7 @@ function App() {
             <Route element={<AuthLayout />}>
               <Route path="/login" element={<LoginPage />} />
               <Route path="/register" element={<RegisterPage />} />
+              <Route path="/activar" element={<ActivarPage />} />
             </Route>
 
 
@@ -60,7 +62,6 @@ function App() {
                     'admin',
                     'supervisor',
                     'operario',
-                    'empleado',
                     'particular',
                   ]}
                 />

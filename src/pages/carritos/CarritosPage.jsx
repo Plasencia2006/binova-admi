@@ -92,14 +92,13 @@ export default function CarritosPage() {
     const handleSubmit = async (data) => {
         setSaving(true)
         try {
-            // Body según API: codigo, placa, capacidad, zona (o zona_id)
+            // Body según API: codigo, placa, capacidad_l, zona_id
             const payload = {
                 codigo: data.codigo,
                 placa: data.placa || undefined,
-                capacidad: Number(data.capacidad),
+                capacidad_l: Number(data.capacidad_l),
             }
             if (data.zona_id) payload.zona_id = Number(data.zona_id)
-            if (data.zona && !data.zona_id) payload.zona = data.zona
 
             if (modalMode === 'create') {
                 await carritoService.create(payload)
@@ -242,7 +241,7 @@ export default function CarritosPage() {
                                                 {carrito.placa || '—'}
                                             </td>
                                             <td className="px-4 py-3 text-gray-500 hidden md:table-cell">
-                                                {carrito.capacidad != null ? `${carrito.capacidad} L` : '—'}
+                                                {carrito.capacidad_l != null ? `${carrito.capacidad_l} L` : '—'}
                                             </td>
                                             <td className="px-4 py-3 text-gray-500 hidden lg:table-cell">
                                                 {zonaLabel}
@@ -333,7 +332,7 @@ export default function CarritosPage() {
                             <div>
                                 <p className="text-gray-400">Capacidad</p>
                                 <p className="font-medium text-gray-900">
-                                    {selected.capacidad != null ? `${selected.capacidad} L` : '—'}
+                                    {selected.capacidad_l != null ? `${selected.capacidad_l} L` : '—'}
                                 </p>
                             </div>
                             <div className="col-span-2">
