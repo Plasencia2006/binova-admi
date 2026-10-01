@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import { Mail, Lock, Eye, EyeOff } from 'lucide-react'
 
@@ -11,7 +10,6 @@ export default function LoginPage() {
     const [loading, setLoading] = useState(false)
 
     const { login } = useAuth()
-    const navigate = useNavigate()
 
     const handleSubmit = async (e) => {
         e.preventDefault()
@@ -111,15 +109,7 @@ export default function LoginPage() {
                 </div>
             </form>
 
-            <p className="mt-6 text-center text-sm text-binova-gray animate-fade-in-up animate-delay-300">
-                ¿No tienes cuenta?{' '}
-                <Link
-                    to="/register"
-                    className="text-binova-green font-medium hover:underline transition-colors"
-                >
-                    Regístrate
-                </Link>
-            </p>
+
         </div>
     )
 }
