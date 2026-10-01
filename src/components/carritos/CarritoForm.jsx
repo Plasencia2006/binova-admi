@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react'
 const initialForm = {
     codigo: '',
     placa: '',
-    capacidad: '',
+    capacidad_l: '',
     zona_id: '',
 }
 
@@ -16,7 +16,7 @@ export default function CarritoForm({ carrito, zonas = [], onSubmit, onCancel })
             setForm({
                 codigo: carrito.codigo || '',
                 placa: carrito.placa || '',
-                capacidad: carrito.capacidad ?? '',
+                capacidad_l: carrito.capacidad_l ?? '',
                 zona_id: carrito.zona_id ?? carrito.zona?.id ?? '',
             })
         } else {
@@ -33,8 +33,8 @@ export default function CarritoForm({ carrito, zonas = [], onSubmit, onCancel })
     const validate = () => {
         const newErrors = {}
         if (!form.codigo.trim()) newErrors.codigo = 'El código es obligatorio'
-        if (!form.capacidad || Number(form.capacidad) <= 0) {
-            newErrors.capacidad = 'Ingresa una capacidad válida'
+        if (!form.capacidad_l || Number(form.capacidad_l) <= 0) {
+            newErrors.capacidad_l = 'Ingresa una capacidad válida'
         }
         setErrors(newErrors)
         return Object.keys(newErrors).length === 0
@@ -47,7 +47,7 @@ export default function CarritoForm({ carrito, zonas = [], onSubmit, onCancel })
         onSubmit({
             codigo: form.codigo.trim(),
             placa: form.placa.trim() || undefined,
-            capacidad: Number(form.capacidad),
+            capacidad_l: Number(form.capacidad_l),
             zona_id: form.zona_id ? Number(form.zona_id) : undefined,
         })
     }
@@ -83,16 +83,16 @@ export default function CarritoForm({ carrito, zonas = [], onSubmit, onCancel })
                 <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Capacidad (L) *</label>
                     <input
-                        name="capacidad"
+                        name="capacidad_l"
                         type="number"
-                        value={form.capacidad}
+                        value={form.capacidad_l}
                         onChange={handleChange}
                         placeholder="500"
-                        className={`w-full px-3 py-2.5 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#6EA838] ${errors.capacidad ? 'border-red-300' : 'border-gray-200'
+                        className={`w-full px-3 py-2.5 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#6EA838] ${errors.capacidad_l ? 'border-red-300' : 'border-gray-200'
                             }`}
                     />
-                    {errors.capacidad && (
-                        <p className="text-xs text-red-500 mt-1">{errors.capacidad}</p>
+                    {errors.capacidad_l && (
+                        <p className="text-xs text-red-500 mt-1">{errors.capacidad_l}</p>
                     )}
                 </div>
                 <div>

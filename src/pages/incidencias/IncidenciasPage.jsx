@@ -16,7 +16,7 @@ const TIPOS = [
 export default function IncidenciasPage() {
     const { rol } = useAuth()
     const puedeResolver = rol === 'admin' || rol === 'supervisor'
-    const puedeReportar = ['admin', 'supervisor', 'operario', 'empleado'].includes(rol)
+    const puedeReportar = ['admin', 'supervisor', 'operario'].includes(rol)
 
     const [items, setItems] = useState([])
     const [contenedores, setContenedores] = useState([])

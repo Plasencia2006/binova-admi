@@ -23,15 +23,15 @@ import logo from '../../assets/logo-binova-icono.png'
 
 const ALL_MENU = [
     { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard, roles: ['admin', 'supervisor'] },
-    { name: 'Contenedores', path: '/tachos', icon: Trash2, roles: ['admin', 'supervisor', 'operario', 'empleado', 'particular'] },
+    { name: 'Contenedores', path: '/tachos', icon: Trash2, roles: ['admin', 'supervisor', 'operario', 'particular'] },
     { name: 'Carritos', path: '/carritos', icon: Truck, roles: ['admin', 'supervisor', 'operario'] },
     { name: 'Alertas', path: '/alertas', icon: AlertTriangle, roles: ['admin', 'supervisor', 'operario'] },
     { name: 'Turno', path: '/turno', icon: Clock, roles: ['operario', 'admin', 'supervisor'] },
     { name: 'Recolecciones', path: '/recolecciones', icon: PackageCheck, roles: ['admin', 'supervisor', 'operario'] },
-    { name: 'Incidencias', path: '/incidencias', icon: Wrench, roles: ['admin', 'supervisor', 'operario', 'empleado'] },
-    { name: 'Mapa', path: '/mapa', icon: Map, roles: ['admin', 'supervisor', 'operario', 'empleado', 'particular'] },
+    { name: 'Incidencias', path: '/incidencias', icon: Wrench, roles: ['admin', 'supervisor', 'operario'] },
+    { name: 'Mapa', path: '/mapa', icon: Map, roles: ['admin', 'supervisor', 'operario', 'particular'] },
     { name: 'Usuarios', path: '/usuarios', icon: Users, roles: ['admin', 'supervisor'] },
-    { name: 'Configuración', path: '/configuracion', icon: Settings, roles: ['admin', 'supervisor', 'operario', 'empleado', 'particular'] },
+    { name: 'Configuración', path: '/configuracion', icon: Settings, roles: ['admin', 'supervisor', 'operario', 'particular'] },
 ]
 
 export default function Sidebar() {

@@ -59,27 +59,43 @@ export default function OrganizacionesPage() {
     }, [orgs, search])
 
     const aprobar = async (org) => {
-        setActionLoading(org.id)
-        try {
-            const data = await organizacionService.aprobar(org.id)
-            // La API devuelve admin.clave_temporal una sola vez
-            const clave =
-                data?.admin?.clave_temporal ||
-                data?.clave_temporal ||
-                data?.admin_clave_temporal
-            if (clave) {
-                setClaveModal({
-                    org: org.nombre,
-                    correo: data?.admin?.correo || org.contacto_correo,
-                    clave,
-                })
-            }
-            await load()
-        } catch (err) {
-            alert(err.response?.data?.message || 'Error al aprobar')
-        } finally {
-            setActionLoading(null)
+    setActionLoading(org.id)
+    try {
+        const data = await organizacionService.aprobar(org.id)
+        const clave =
+        data?.admin?.clave_temporal ||
+        data?.clave_temporal ||
+        data?.admin_clave_temporal
+
+        // Flujo nuevo: correo con enlace de activación
+        const correoEnviado =
+        data?.correo_enviado === true ||
+        data?.email_enviado === true ||
+        !!data?.activacion_enviada
+
+        if (clave) {
+        // Compatibilidad: si aún devuelve clave temporal
+        setClaveModal({
+            org: org.nombre,
+            correo: data?.admin?.correo || org.contacto_correo,
+            clave,
+            modo: 'clave',
+        })
+        } else {
+        setClaveModal({
+            org: org.nombre,
+            correo: data?.admin?.correo || org.contacto_correo,
+            clave: null,
+            modo: 'email',
+            correoEnviado,
+        })
         }
+        await load()
+    } catch (err) {
+        alert(err.response?.data?.message || 'Error al aprobar')
+    } finally {
+        setActionLoading(null)
+    }
     }
 
     const cambiarEstado = async (org, estado) => {
@@ -254,49 +270,44 @@ export default function OrganizacionesPage() {
 
             {/* Modal clave temporal */}
             <Modal
-                isOpen={!!claveModal}
-                onClose={() => setClaveModal(null)}
-                title="Organización aprobada"
-                size="sm"
+            isOpen={!!claveModal}
+            onClose={() => setClaveModal(null)}
+            title="Organización aprobada"
+            size="sm"
             >
-                {claveModal && (
-                    <div className="space-y-4 text-sm">
-                        <p className="text-gray-600">
-                            Se creó el usuario admin para <strong>{claveModal.org}</strong>.
-                        </p>
-                        <p className="text-gray-600">
-                            Correo: <strong>{claveModal.correo}</strong>
-                        </p>
-                        <div className="p-3 bg-amber-50 border border-amber-100 rounded-xl">
-                            <p className="text-xs text-amber-700 mb-1 font-medium">
-                                Clave temporal (solo se muestra una vez)
-                            </p>
-                            <div className="flex items-center gap-2">
-                                <code className="flex-1 text-sm font-mono text-gray-900 break-all">
-                                    {claveModal.clave}
-                                </code>
-                                <button
-                                    onClick={copyClave}
-                                    className="p-2 rounded-lg hover:bg-amber-100 text-amber-700"
-                                    title="Copiar"
-                                >
-                                    <Copy size={16} />
-                                </button>
-                            </div>
-                        </div>
-                        <p className="text-xs text-gray-400">
-                            Guárdala y envíasela al contacto. No se volverá a mostrar.
-                        </p>
-                        <div className="flex justify-end">
-                            <button
-                                onClick={() => setClaveModal(null)}
-                                className="px-4 py-2 bg-[#6EA838] text-white text-sm rounded-lg hover:bg-[#5a8f2e]"
-                            >
-                                Entendido
-                            </button>
-                        </div>
+            {claveModal && (
+                <div className="space-y-4 text-sm">
+                <p className="text-gray-600">
+                    Se aprobó <strong>{claveModal.org}</strong>.
+                </p>
+                <p className="text-gray-600">
+                    Contacto: <strong>{claveModal.correo}</strong>
+                </p>
+
+                {claveModal.modo === 'clave' && claveModal.clave ? (
+                    <div className="p-3 bg-amber-50 border border-amber-100 rounded-xl">
+                    <p className="text-xs text-amber-700 mb-1 font-medium">
+                        Clave temporal (solo se muestra una vez)
+                    </p>
+                    <code className="text-sm font-mono break-all">{claveModal.clave}</code>
+                    </div>
+                ) : (
+                    <div className="p-3 bg-emerald-50 border border-emerald-100 rounded-xl text-emerald-800">
+                    Se envió un correo al contacto con el{' '}
+                    <strong>enlace para crear su clave</strong> (válido 72 horas).
                     </div>
                 )}
+
+                <div className="flex justify-end">
+                    <button
+                    onClick={() => setClaveModal(null)}
+                    className="px-4 py-2 bg-[#6EA838] text-white text-sm rounded-lg hover:bg-[#5a8f2e]"
+                    >
+                    Entendido
+                    </button>
+                </div>
+                </div>
+            )}
             </Modal>
         </div>
     )
