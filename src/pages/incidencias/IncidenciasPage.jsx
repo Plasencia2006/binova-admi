@@ -30,20 +30,6 @@ export default function IncidenciasPage() {
     })
     const [saving, setSaving] = useState(false)
 
-    // Particular no tiene acceso a incidencias en la API
-    if (rol === 'particular') {
-        return (
-            <div className="max-w-md mx-auto mt-10 bg-white rounded-2xl border border-gray-100 p-8 text-center shadow-sm">
-                <h1 className="text-xl font-bold text-gray-900 mb-2">Incidencias</h1>
-                <p className="text-sm text-gray-500 leading-relaxed">
-                    Las incidencias están disponibles para empleados y personal de operación.
-                    Como <strong>particular</strong> puedes gestionar y vincular tus contenedores
-                    desde el menú Contenedores.
-                </p>
-            </div>
-        )
-    }
-
     const load = async () => {
         setLoading(true)
         setError('')
@@ -67,10 +53,8 @@ export default function IncidenciasPage() {
     }
 
     useEffect(() => {
-        if (rol !== 'particular') {
-            load()
-        }
-    }, [rol])
+        load()
+    }, [])
 
     const handleCreate = async (e) => {
         e.preventDefault()

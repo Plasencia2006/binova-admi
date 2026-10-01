@@ -3,6 +3,7 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { Lock, Eye, EyeOff, CheckCircle, AlertCircle } from 'lucide-react'
 import { authService } from '../../services/authService'
 import { useAuth } from '../../context/AuthContext'
+import { rutaInicioPara } from '../../utils/rutaInicio'
 
 const MENSAJES_ERROR = {
   invitacion_invalida: 'Este enlace no es válido.',
@@ -70,7 +71,7 @@ export default function ActivarPage() {
       if (invitacion?.correo) {
         try {
           const usuario = await login(invitacion.correo, clave)
-          navigate(usuario.rol === 'superadmin' ? '/superadmin' : '/dashboard', { replace: true })
+          navigate(rutaInicioPara(usuario.rol), { replace: true })
         } catch {
           // Si el login automático falla, se queda en la pantalla de "activada" con link a /login
         }

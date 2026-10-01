@@ -1,5 +1,6 @@
 import { Navigate, Outlet, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import { rutaInicioPara } from '../utils/rutaInicio'
 
 /**
  * rolesPermitidos: array opcional de roles, ej. ['admin', 'supervisor']
@@ -25,11 +26,7 @@ export default function ProtectedRoute({ rolesPermitidos }) {
     }
 
     if (rolesPermitidos?.length && !rolesPermitidos.includes(rol)) {
-        // Superadmin va a su panel; el resto al dashboard org
-        if (rol === 'superadmin') {
-            return <Navigate to="/superadmin" replace />
-        }
-        return <Navigate to="/dashboard" replace />
+        return <Navigate to={rutaInicioPara(rol)} replace />
     }
 
     return <Outlet />

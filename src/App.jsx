@@ -10,6 +10,7 @@ import SolicitudEmpresaPage from './pages/public/SolicitudEmpresaPage'
 import LoginPage from './pages/auth/LoginPage'
 import RegisterPage from './pages/auth/RegisterPage'
 import ActivarPage from './pages/auth/ActivarPage'
+import SoloMovilPage from './pages/auth/SoloMovilPage'
 import DashboardPage from './pages/dashboard/DashboardPage'
 import TachosPage from './pages/tachos/TachosPage'
 import CarritosPage from './pages/carritos/CarritosPage'
@@ -42,6 +43,7 @@ function App() {
               <Route path="/login" element={<LoginPage />} />
               <Route path="/register" element={<RegisterPage />} />
               <Route path="/activar" element={<ActivarPage />} />
+              <Route path="/solo-movil" element={<SoloMovilPage />} />
             </Route>
 
 
@@ -61,8 +63,6 @@ function App() {
                   rolesPermitidos={[
                     'admin',
                     'supervisor',
-                    'operario',
-                    'particular',
                   ]}
                 />
               }

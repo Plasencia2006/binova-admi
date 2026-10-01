@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
+import { rutaInicioPara } from '../../utils/rutaInicio'
 import { Mail, Lock, Eye, EyeOff } from 'lucide-react'
 
 export default function LoginPage() {
@@ -10,7 +11,7 @@ export default function LoginPage() {
     const [error, setError] = useState('')
     const [loading, setLoading] = useState(false)
 
-    const { login } = useAuth()
+    const { login, logout } = useAuth()
     const navigate = useNavigate()
 
     const handleSubmit = async (e) => {
@@ -20,13 +21,12 @@ export default function LoginPage() {
 
         try {
             const usuario = await login(correo.trim(), clave)
-
-            // Redirección según rol
-            if (usuario.rol === 'superadmin') {
-                navigate('/superadmin', { replace: true })
-            } else {
-                navigate('/dashboard', { replace: true })
+            if (usuario.rol === 'operario' || usuario.rol === 'particular') {
+                logout()
+                navigate('/solo-movil', { replace: true })
+                return
             }
+            navigate(rutaInicioPara(usuario.rol), { replace: true })
         } catch (err) {
             const msg =
                 err.response?.data?.message ||
